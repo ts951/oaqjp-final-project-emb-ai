@@ -19,13 +19,19 @@ def emotion_detector(text_to_analyse):
     input_json = {"raw_document": {"text": text_to_analyse}}
     # Send POST request with json and headers and get response
     response = requests.post(url, json = input_json, headers = headers)
-    # Return response data
-    return response.text
+    # Convert response text into a dictionary
+    response_data = json.loads(response.text)
+    # Extract emotions dictionary from data
+    emotion_data = response_data["emotionPredictions"][0]["emotion"]
     
+    # Iterate over the emotion data, extracting scores for each emotion and comparing to the current 
+    # highest seen score (starting at 0) find the emotion with the highest score
+    highest_score = 0
+    for emotion in emotion_data:   
+        if emotion_data[emotion] > highest_score:
+            highest_score = emotion_data[emotion]
+            dominant_emotion = emotion
     
-    # Convert JSON data in response to a dictionary
-    #response_data = json.loads(response.text)
-
-    #print(response_data)
-
-#emotion_detection("I'm so pissssssed!")
+    # Add dominant emotion to emotion_data dictionary and return it
+    emotion_data['dominant_emotion'] = dominant_emotion
+    return emotion_data
